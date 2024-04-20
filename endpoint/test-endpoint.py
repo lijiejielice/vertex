@@ -6,11 +6,11 @@ from google.cloud import aiplatform
 
 # Configuration
 project = "283176491096"
-endpoint_id = "6236212249443172352"
 location = "us-central1"
 
-# Authentication (if necessary)
-#credentials, project_id = google.auth.default() 
+# Manually created on Pantheon, using 
+endpoint_id = "6236212249443172352"
+
 
 # Initialize Vertex AI client
 aiplatform.init(project=project, location=location)
@@ -29,7 +29,6 @@ def image_grid(imgs, rows=2, cols=2):
         grid.paste(img, box=(i % cols * w, i // cols * h))
     return grid
 
-# Example usage  
 if __name__ == "__main__":    
     instances = [
         {"prompt": "female google employee who is a software engineer working on GCP product"},
@@ -38,9 +37,7 @@ if __name__ == "__main__":
     # Send prediction request to the endpoint
     response = endpoint.predict(instances=instances)
 
-   # images = [base64_to_image(image) for image in response.predictions]
-   # image_grid(images).show()
-    for i, image_str in enumerate(response.predictions):
+for i, image_str in enumerate(response.predictions):
         image = base64_to_image(image_str)
-        image_filename = f"2nd_generated_image_{i+1}.jpg"  # Or ".png" if appropriate
-        image.save(image_filename) 
+        image_filename = f"generated/generated_image_{i+1}.jpg"  # Check file path
+        image.save(image_filename)

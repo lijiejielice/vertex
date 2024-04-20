@@ -3,13 +3,10 @@ from vertexai.preview import extensions
 import vertexai
 from vertexai.preview import extensions
 
-PROJECT_ID = "283176491096"  # @param {type:"string"}
-LOCATION = "us-central1"  # @param {type:"string"}
+PROJECT_ID = "283176491096"
+LOCATION = "us-central1"
 
-vertexai.init(project=PROJECT_ID,location=LOCATION)
-
-def create_extension() -> extensions.Extension:
-    """Creates a new extension.
+""" Run this function once to create a new extension. 
 
     Args:
         display_name: The display name of the extension.
@@ -19,16 +16,10 @@ def create_extension() -> extensions.Extension:
     Returns:
         The created extension.
 
-    This is the output for the function:
-    Creating Extension
-    Create Extension backing LRO: projects/283176491096/locations/us-central1/extensions/8135119408147202048/operations/4031406696600436736
+    Sample output logs:
     Extension created. Resource name: projects/283176491096/locations/us-central1/extensions/8135119408147202048
-    To use this Extension in another session:
-    extension = vertexai.preview.extensions.Extension('projects/283176491096/locations/us-central1/extensions/8135119408147202048')
-    <vertexai.extensions._extensions.Extension object at 0x7c4154431f10> 
-    resource name: projects/283176491096/locations/us-central1/extensions/8135119408147202048
     """
-
+def create_extension() -> extensions.Extension:
     extension_code_interpreter = extensions.Extension.create(
     display_name = "Code Interpreter",
     description = "This extension generates and executes code in the specified language",
@@ -44,9 +35,10 @@ def create_extension() -> extensions.Extension:
         },
     },)
 
-
-EXTENSION_ID="8135119408147202048"
+EXTENSION_ID="8135119408147202048" # See README
+vertexai.init(project=PROJECT_ID,location=LOCATION)
 extension_code_interpreter = extensions.Extension(EXTENSION_ID)
+
 print(extension_code_interpreter.execute(
     operation_id = "generate_and_execute",
     operation_params = {"query": "Tell me if abdofhkabdfb is a Palindrome"},

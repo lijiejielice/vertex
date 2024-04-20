@@ -1,0 +1,6 @@
+Test Extension, similar to ChatGPT plugins/extensions. 
+- plugin an API to enable specific tasks. e.g. login through GCP Workforce Pool from ChatGPT.
+
+Extension can be created manually in Pantheon or programmatially.
+Doc: https://cloud.google.com/vertex-ai/generative-ai/docs/extensions/create-extension
+Only two type of extensions are supported as of 04/2024.

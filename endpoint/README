@@ -1,0 +1,4 @@
+Test Vertex AI endpoint
+Spin up a Vertex AI supproted LLM model as an enpoint, send requests over.  
+
+https://cloud.google.com/vertex-ai/docs/general/deployment

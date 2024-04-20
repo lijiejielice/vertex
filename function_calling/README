@@ -1,0 +1,3 @@
+Test Function Calling
+- register functions with Vertex AI
+- Vertex AI can leverage your function to respond to a prompt, e.g. latest bitcoin prices

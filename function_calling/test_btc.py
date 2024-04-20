@@ -25,7 +25,7 @@ get_current_bitcoin_price = FunctionDeclaration(
 )
 model = GenerativeModel("gemini-1.0-pro", generation_config={
                         "temperature": 0}, tools=[Tool(function_declarations=[get_current_bitcoin_price])])
-URL = "https://api.coindesk.com/v1/bpi/currentprice/"
+URL = "https://api.coindesk.com/v1/bpi/currentprice"
 bitcoin_tool = Tool(
     function_declarations=[get_current_bitcoin_price],
 )
@@ -35,7 +35,9 @@ while True:
     prompt = input("Enter your question: ")
     response = chat.send_message(prompt)
     if response.candidates[0].content.parts[0].function_call:
-        currency = response.candidates[0].content.parts[0].function_call.args["currency"]
+        currency = ".json"
+        if "currency" in response.candidates[0].content.parts[0].function_call.args:
+            currency = f"/{response.candidates[0].content.parts[0].function_call.args['currency']}" 
         api_response = requests.get(URL+currency).json()
         response = chat.send_message(
             Part.from_function_response(
