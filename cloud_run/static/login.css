@@ -1,0 +1,60 @@
+/* General body, font, and full-page container styles */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+    background-color: #f6f8fa;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Login form specific styles */
+.login-container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 300px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-form h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.login-form p {
+    font-size: 14px;
+    color: #586069;
+    margin-top: 0;
+    margin-bottom: 16px;
+}
+
+#login-btn {
+    background-color: #2ea44f;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+#login-btn:hover {
+    background-color: #22863a;
+}
+
+/* Ensure the form stays in the middle */
+@media (max-height: 500px) {
+    body {
+        align-items: flex-start;
+        padding-top: 20px;
+    }
+}

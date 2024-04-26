@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login</title>
+<link rel="stylesheet" href="/static/login.css">
+</head>
+<body>
+<div class="login-container">
+    <form class="login-form">
+        <h1>Login</h1>
+        <p>Sign in to Bitcoin On Cloud</p>
+        <button type="button" id="login-btn">Login with GitHub</button>
+    </form>
+</div>
+<script src="https://www.gstatic.com/firebasejs/8.0/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.0/firebase-auth.js"></script>
+<script>
+  var config = {
+    apiKey: "AIzaSyChPqepTpVVHlV6F9FNdatjZ19WP-kMlFE",
+    authDomain: "awesome-demo-302823.firebaseapp.com",
+  };
+  firebase.initializeApp(config);
+
+  var provider = new firebase.auth.GithubAuthProvider();
+
+  var loginButton = document.getElementById('login-btn');
+  loginButton.addEventListener('click', function() {
+    firebase.auth()
+      .signInWithPopup(provider)
+      .then((result) => {
+        var credential = result.credential;
+        var token = credential.accessToken;
+        // Send the token to the Flask server for validation and session creation
+        fetch('/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({access_token: token})
+        })
+        .then(response => response.json())
+        .then(data => {
+          if(data.message) {
+            // Redirect to index.html if login is successful
+            window.location.href = '/'; // Adjust the URL as needed
+          } else {
+            alert('Login failed: ' + data.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+      }).catch((error) => {
+        alert('Error logging in: ' + error.message);
+      });
+  });
+</script>
+</body>
+</html>

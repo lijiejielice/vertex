@@ -7,6 +7,9 @@
 <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
+<header>
+    <button id="logout-btn" onclick="logout()">Logout</button>
+</header>
 <div id="chat-container">
     <div id="chat-box"></div>
     <div id="input-container">
@@ -14,6 +17,27 @@
         <button onclick="sendMessage()">&#10148;</button> <!-- Unicode right arrow -->
     </div>
 </div>
+<script>
+function logout() {
+    fetch('/logout', {
+        method: 'POST',  // Assuming logout needs a POST call
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            alert('You have been logged out.');
+            window.location.href = '/login';  // Redirect to the login page after logout
+        } else {
+            alert('Logout failed.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
 <script src="/static/script.js"></script>
 </body>
 </html>

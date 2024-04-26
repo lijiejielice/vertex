@@ -54,3 +54,25 @@ button {
 .system-message {
     align-self: flex-start;
 }
+
+header {
+    width: 100%;
+    padding: 10px 0;
+    box-sizing: border-box;
+    background: #f8f9fa;  /* Light grey background, you can change it as per your design */
+}
+
+#logout-btn {
+    float: right;
+    margin-right: 20px;
+    padding: 8px 16px;
+    background-color: #dc3545; /* Bootstrap's danger color for logout button */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#logout-btn:hover {
+    background-color: #c82333; /* Darker shade for hover effect */
+}
