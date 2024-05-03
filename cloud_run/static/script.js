@@ -28,7 +28,7 @@ function sendMessage() {
 
 function displayMessage(message, className) {
     const messageDiv = document.createElement('div');
-    messageDiv.textContent = message;
+    messageDiv.innerHTML = message; // Changed from textContent to innerHTML
     messageDiv.className = `message ${className}`;
     document.getElementById('chat-box').appendChild(messageDiv);
     messageDiv.scrollIntoView(); // Ensure the latest message is visible

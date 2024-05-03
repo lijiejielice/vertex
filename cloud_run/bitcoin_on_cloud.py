@@ -3,6 +3,7 @@ import requests
 from flask import Flask, request, jsonify, session, redirect, url_for
 from vertexai.generative_models import Content, FunctionDeclaration, GenerativeModel, Part, Tool
 import vertexai
+import markdown
 
 # Initialize Vertex AI
 PROJECT_ID = "283176491096"
@@ -94,9 +95,11 @@ def predict():
         )
     print(user_query)
     print("Response from Vertex AI:")
-    print(response.candidates[0].content.parts[0].text)
+    content = response.candidates[0].content.parts[0].text
+    print(content)
+    markdown_content = markdown.markdown(content)
     return jsonify({
-            "message": response.candidates[0].content.parts[0].text
+            "message": markdown_content
         }) 
 
 if __name__ == "__main__":
