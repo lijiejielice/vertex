@@ -1,4 +1,15 @@
-### Release Notes - Version 1.0
+## Release Notes
+### Version 2.0
+Added support for getting latest stock prices
+
+#### Known Issues
+- **Invalid Stock Symbol Handling**: Gemini does not handle error response from an endpoint as of 05/25/2024.
+
+- **Message Sequence Enforcement**: Message sequence is not enforced. It's possible your second prompt is responded first.
+
+- **API Dependency**: The application's performance and availability are highly dependent on the external API from Coindesk and GitHub's OAuth service.
+
+### Version 1.0
 
 #### Overview
 This release introduces a new Flask web application designed to provide users with the latest Bitcoin prices upon request, leveraging Vertex AI's capabilities to handle user queries dynamically. The application also integrates GitHub for user authentication, enhancing security and personalization.
