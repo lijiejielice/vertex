@@ -6,10 +6,20 @@ import json
 import logging
 import time
 import requests
+from dotenv import load_dotenv
+from .notify_template import chat_payload
+
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 MONITORED_STOCKS = ["SPY"]
 ALERT_THRESHOLDS = {"SPY": 530}
-STOCK_URL_FORMAT = "https://data.alpaca.markets/v2/stocks/trades/latest"
+STOCK_URL = "https://data.alpaca.markets/v2/stocks/trades/latest"
+POLL_INTERVAL = 3  # in seconds
+CHAT_WEBHOOK_URL = os.environ["CHAT_WEBHOOK_URL"]
+
 
 # Configure the logging
 logging.basicConfig(
@@ -22,9 +32,7 @@ logging.basicConfig(
 )
 
 
-
-
-def maybe_notify(api_response):
+def maybe_notify(api_response: dict):
     """Inspects the API response for stock data and provides detailed information."""
 
     if "trades" not in api_response:
@@ -53,21 +61,29 @@ def maybe_notify(api_response):
             if key not in ["p", "t"]:  # Exclude already printed data
                 print(f"    {key}: {value}")
 
+    # Send notification to webhook
+    response = requests.post(CHAT_WEBHOOK_URL, json=chat_payload(api_response["trades"]))
+    print("Webhook result: ", response.status_code)
+
     # Raw response for debugging (optional)
     print("\n--- Raw API Response ---")
     print(json.dumps(api_response, indent=2))
 
-while True:
-    # Headers for authentication
-    headers = {
-        'APCA-API-KEY-ID': os.environ["API_KEY_ID"],
-        'APCA-API-SECRET-KEY': os.environ["API_KEY_SECRET"]
-    }
-    params = {"symbols": ",".join(MONITORED_STOCKS)}
-    api_response = requests.get(
-        STOCK_URL_FORMAT, headers=headers, params=params).json()
-    maybe_notify(api_response)
-    time.sleep(3)
+
+def main():
+    while True:
+        # Headers for authentication
+        headers = {
+            'APCA-API-KEY-ID': os.environ["API_KEY_ID"],
+            'APCA-API-SECRET-KEY': os.environ["API_KEY_SECRET"]
+        }
+        params = {
+            "symbols": ",".join(MONITORED_STOCKS)
+        }
+        api_response = requests.get(
+            STOCK_URL, headers=headers, params=params).json()
+        maybe_notify(api_response)
+        time.sleep(POLL_INTERVAL)
 
 # trading_client = TradingClient(os.environ["API_KEY_ID"], os.environ["API_KEY_SECRET"], paper=True)
 # # preparing market order
@@ -96,3 +112,4 @@ while True:
 # limit_order = trading_client.submit_order(
 #                 order_data=limit_order_data
 #               )
+
