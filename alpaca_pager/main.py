@@ -15,10 +15,11 @@ load_dotenv()
 
 
 MONITORED_STOCKS = ["SPY"]
-ALERT_THRESHOLDS = {"SPY": 530}
+ALERT_THRESHOLDS = {"SPY": [520, 530]}
 STOCK_URL = "https://data.alpaca.markets/v2/stocks/trades/latest"
 POLL_INTERVAL = 3  # in seconds
 CHAT_WEBHOOK_URL = os.environ["CHAT_WEBHOOK_URL"]
+LOG_FILE = "alpaca_pager.log"  # Name of the log file
 
 
 # Configure the logging
@@ -27,47 +28,35 @@ logging.basicConfig(
     # Format of the log messages
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
+        logging.FileHandler(LOG_FILE),  # Log messages to a file
         logging.StreamHandler()  # Log messages to the console
     ]
 )
 
-
 def maybe_notify(api_response: dict):
     """Inspects the API response for stock data and provides detailed information."""
 
+    # TODO: send webhook notification that server crashes
     if "trades" not in api_response:
         raise ValueError(
             "Unexpected API response format: 'trades' key not found")
 
-    # Basic summary
-    print("\n--- Stock Data Summary ---")
-    print(f"Number of symbols: {len(api_response['trades'])}")
+    notify_stocks = {}
 
     for symbol, trade_data in api_response['trades'].items():
-        print(f"\nSymbol: {symbol}")
-
         # Check for missing data
         if not trade_data:
-            print("No trade data available.")
+            logging.warning("Missing trade data for stock: %s. Skipping.", symbol)
             continue
-
-        # Essential details
-        print(f"  Price: {trade_data['p']}")
-        print(f"  Timestamp: {trade_data['t']}")
-
-        # More in-depth analysis (optional)
-        print("  Additional Details:")
-        for key, value in trade_data.items():
-            if key not in ["p", "t"]:  # Exclude already printed data
-                print(f"    {key}: {value}")
+        
+        lower_band, upper_band = ALERT_THRESHOLDS[symbol]
+        if trade_data["p"] <= lower_band or trade_data["p"] >= upper_band:
+            notify_stocks[symbol] = trade_data
 
     # Send notification to webhook
-    response = requests.post(CHAT_WEBHOOK_URL, json=chat_payload(api_response["trades"]))
-    print("Webhook result: ", response.status_code)
-
-    # Raw response for debugging (optional)
-    print("\n--- Raw API Response ---")
-    print(json.dumps(api_response, indent=2))
+    # TODO: Add notify reason: belong/beyond threshold 
+    logging.info("Notifying stocks: %s", notify_stocks)
+    response = requests.post(CHAT_WEBHOOK_URL, json=chat_payload(notify_stocks))
 
 
 def main():
