@@ -1,5 +1,5 @@
 import dateutil
-
+from requests import Response
 
 def chat_payload(trades_data):
     notify_data = []
@@ -37,3 +37,37 @@ def chat_payload(trades_data):
         ]
     }
     return payload
+
+
+def chat_warning(api_response: Response):
+    notify_data = []
+    notify_data.append({
+        "Error Message": api_response.text,
+        "Error Code": api_response.status_code,
+    })
+
+    payload = {
+        "cards": [
+            {
+                "header": {
+                    "title": "Application Error Alert",
+                    "subtitle": "Detailed Error Information"
+                },
+                "sections": [
+                    {
+                        "widgets": [
+                            {
+                                "textParagraph": {
+                                    "text": "\n".join(f"{key}: {value}" for key, value in data.items())
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+            for data in notify_data
+        ]
+    }
+    
+    return payload
+

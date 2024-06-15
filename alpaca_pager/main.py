@@ -4,23 +4,22 @@ import json
 # from alpaca.trading.requests import MarketOrderRequest
 # from alpaca.trading.enums import OrderSide, TimeInForce
 import logging
-import time
+from time import sleep
+from datetime import datetime, time
+from zoneinfo import ZoneInfo
 import requests
 from dotenv import load_dotenv
-from .notify_template import chat_payload
+from .notify_template import chat_payload, chat_warning
+import yaml
 
+POLL_INTERVAL = 3600  # in seconds
 
 # Load environment variables from .env file
 load_dotenv()
 
-
-MONITORED_STOCKS = ["SPY"]
-ALERT_THRESHOLDS = {"SPY": [520, 530]}
-STOCK_URL = "https://data.alpaca.markets/v2/stocks/trades/latest"
-POLL_INTERVAL = 3  # in seconds
 CHAT_WEBHOOK_URL = os.environ["CHAT_WEBHOOK_URL"]
 LOG_FILE = "alpaca_pager.log"  # Name of the log file
-
+STOCK_URL = "https://data.alpaca.markets/v2/stocks/trades/latest"
 
 # Configure the logging
 logging.basicConfig(
@@ -33,7 +32,7 @@ logging.basicConfig(
     ]
 )
 
-def maybe_notify(api_response: dict):
+def maybe_notify(api_response: dict, trading_config: requests.Response):
     """Inspects the API response for stock data and provides detailed information."""
 
     # TODO: send webhook notification that server crashes
@@ -49,8 +48,8 @@ def maybe_notify(api_response: dict):
             logging.warning("Missing trade data for stock: %s. Skipping.", symbol)
             continue
         
-        lower_band, upper_band = ALERT_THRESHOLDS[symbol]
-        if trade_data["p"] <= lower_band or trade_data["p"] >= upper_band:
+        lower_bound, upper_bound = trading_config["alert_thresholds"][symbol]["lower_bound"], trading_config["alert_thresholds"][symbol]["upper_bound"]
+        if trade_data["p"] <= lower_bound or trade_data["p"] >= upper_bound:
             notify_stocks[symbol] = trade_data
 
     # Send notification to webhook
@@ -58,21 +57,61 @@ def maybe_notify(api_response: dict):
     logging.info("Notifying stocks: %s", notify_stocks)
     response = requests.post(CHAT_WEBHOOK_URL, json=chat_payload(notify_stocks))
 
+def notify_error(api_response: dict):
+    logging.warning("Failed to fetch stock data, got %s.", api_response)
+    response = requests.post(CHAT_WEBHOOK_URL, json=chat_warning(api_response))
 
+def is_nyse_open():
+    # Get the current time in the NYC timezone 
+    nyc_tz = ZoneInfo('America/New_York')
+    now = datetime.now(nyc_tz)
+
+    # Check if today is a weekday (Monday=0, Sunday=6)
+    if now.weekday() >= 5:  # 5 is Saturday, 6 is Sunday
+        return False
+
+    # NYSE trading hours
+    market_open = time(9, 30)
+    market_close = time(16, 0)
+
+    # Check if the current time is within market hours
+    if market_open <= now.time() <= market_close:
+        return True
+    else:
+        return False
+
+def fetch_price_maybe_notify():
+    # Fetch the raw content of the YAML file from the Gist URL
+    trading_config = requests.get(os.environ["TRADING_CONFIG_URL"])
+    if not trading_config.ok:
+        notify_error(trading_config)
+        return
+
+    # Parse the YAML content
+    trading_config = yaml.safe_load(trading_config.text)
+    
+    # Headers for authentication
+    headers = {
+        'APCA-API-KEY-ID': os.environ["API_KEY_ID"],
+        'APCA-API-SECRET-KEY': os.environ["API_KEY_SECRET"]
+    }
+    params = {
+        "symbols": ",".join(trading_config["monitored_stocks"])
+    }
+    api_response = requests.get(STOCK_URL, headers=headers, params=params)
+    if api_response.ok:
+        api_response = api_response.json()
+        maybe_notify(api_response, trading_config)
+    else:
+        notify_error(api_response)
+        
 def main():
     while True:
-        # Headers for authentication
-        headers = {
-            'APCA-API-KEY-ID': os.environ["API_KEY_ID"],
-            'APCA-API-SECRET-KEY': os.environ["API_KEY_SECRET"]
-        }
-        params = {
-            "symbols": ",".join(MONITORED_STOCKS)
-        }
-        api_response = requests.get(
-            STOCK_URL, headers=headers, params=params).json()
-        maybe_notify(api_response)
-        time.sleep(POLL_INTERVAL)
+        if is_nyse_open():
+            fetch_price_maybe_notify()
+        else:
+            logging.info("NYSE is closed, skipping.")
+        sleep(POLL_INTERVAL)
 
 # trading_client = TradingClient(os.environ["API_KEY_ID"], os.environ["API_KEY_SECRET"], paper=True)
 # # preparing market order
