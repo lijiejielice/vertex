@@ -1,7 +1,8 @@
 from dotenv import load_dotenv
 from onetwo.backends import gemini_api
 import os
-from python_plan import python_planning_example_with_inspecting
+# Module relative import, adding dot to the path
+from .python_plan import python_planning_example_with_inspecting
 # from react_agent import react_example_with_inspecting
 
 

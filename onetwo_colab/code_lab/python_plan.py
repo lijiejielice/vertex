@@ -7,7 +7,7 @@ from onetwo import ot
 
 from onetwo.agents import python_planning
 from onetwo.stdlib.tool_use import python_tool_use
-from tools import search_tool, first_number_tool
+from .tools import search_tool, first_number_tool
 
 
 # Inspired by Python based tool based orchestration
