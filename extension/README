@@ -1,6 +1,16 @@
-Test Extension, similar to ChatGPT plugins/extensions. 
+# Test Extension, similar to ChatGPT plugins/extensions. 
+Extensions are connections to external APIs that process real-time data and perform real-world actions. 
 - plugin an API to enable specific tasks. e.g. login through GCP Workforce Pool from ChatGPT.
 
 Extension can be created manually in Pantheon or programmatially.
 Doc: https://cloud.google.com/vertex-ai/generative-ai/docs/extensions/create-extension
 Only two type of extensions are supported as of 04/2024.
+
+How To:
+1. You need to config ".env" file to include PROJECT_ID, LOCATION, EXTENSION_ID to consume Vertex AI and pre-created Extension. (Extension in this exampe is Code Interpreter)
+
+2. This app uses [User Accounts (3-legged OAuth 2.0)](https://googleapis.dev/python/google-api-core/latest/auth.html#user-accounts-3-legged-oauth-2-0-with-a-refresh-token) `gcloud auth application-default login`
+
+3. `pip install -r requirements.txt`
+
+4. `python path/to/test_extension.py`
