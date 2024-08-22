@@ -1,3 +1,12 @@
 https://colab.sandbox.google.com/github/google-deepmind/onetwo/blob/main/colabs/tutorial.ipynb
 
-python -m code_lab
+
+How To:
+
+# This lab registered Gemini as the backend). You can also modify code and API Key to use ChatGPT.
+1. You need to config ".env" file to include API_KEY to use Gemini.
+
+# You can modify main.py to run different onetwo examples. 
+# Currently, it runs python_plan or react_agent. This demonstrates GenAI's chain of thoughts to solve more complexed problems. 
+# Primitives includes a lot of simple, conceptual examples.
+2. python -m code_lab

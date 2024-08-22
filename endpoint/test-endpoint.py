@@ -1,26 +1,29 @@
 import base64
+import google
+import os
 from PIL import Image
 from io import BytesIO
-import google.auth
-from google.cloud import aiplatform 
+from google.cloud import aiplatform
 
 # Configuration
-project = "283176491096"
-location = "us-central1"
+PROJECT_ID = os.environ["PROJECT_ID"]
+LOCATION = os.environ["LOCATION"]
+credentials, _ = google.auth.default()
 
-# Manually created on Pantheon, using 
-endpoint_id = "6236212249443172352"
-
+# Manually created in Pantheon
+ENDPOINT_ID = os.environ["ENDPOINT_ID"]
 
 # Initialize Vertex AI client
-aiplatform.init(project=project, location=location)
-endpoint = aiplatform.Endpoint(f"projects/{project}/locations/{location}/endpoints/{endpoint_id}")
+aiplatform.init(project=PROJECT_ID, location=LOCATION, credentials=credentials)
+endpoint = aiplatform.Endpoint(f"projects/{PROJECT_ID}/locations/{LOCATION}/endpoints/{ENDPOINT_ID}")
+
 
 # Core image processing functions (same as before)
 # **Core image processing functions**
 def base64_to_image(image_str):
     image = Image.open(BytesIO(base64.b64decode(image_str)))
     return image
+
 
 def image_grid(imgs, rows=2, cols=2):
     w, h = imgs[0].size
@@ -29,7 +32,8 @@ def image_grid(imgs, rows=2, cols=2):
         grid.paste(img, box=(i % cols * w, i // cols * h))
     return grid
 
-if __name__ == "__main__":    
+
+if __name__ == "__main__":
     instances = [
         {"prompt": "female google employee who is a software engineer working on GCP product"},
     ]
@@ -37,7 +41,8 @@ if __name__ == "__main__":
     # Send prediction request to the endpoint
     response = endpoint.predict(instances=instances)
 
+
 for i, image_str in enumerate(response.predictions):
-        image = base64_to_image(image_str)
-        image_filename = f"generated/generated_image_{i+1}.jpg"  # Check file path
-        image.save(image_filename)
+    image = base64_to_image(image_str)
+    image_filename = f"generated/generated_image_{i+1}.jpg"  # Check file path
+    image.save(image_filename)

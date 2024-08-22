@@ -1,7 +1,7 @@
 import os
 import requests
 from flask import Flask, request, jsonify, session, redirect, url_for
-from vertexai.generative_models import Content, FunctionDeclaration, GenerativeModel, Part, Tool
+from vertexai.generative_models import FunctionDeclaration, GenerativeModel, Part, Tool
 import vertexai
 import markdown
 import logging

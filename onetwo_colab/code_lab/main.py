@@ -11,7 +11,7 @@ load_dotenv()
 
 def register_llm_backend():
     api_key = os.environ["API_KEY"]
-    if not api_key and 'GOOGLE_API_KEY' not in os.environ:
+    if not api_key and 'API_KEY' not in os.environ:
         raise ValueError(
             'The api key must be specified either here or in the environment.')
 

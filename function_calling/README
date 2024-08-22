@@ -1,3 +1,13 @@
-Test Function Calling
+A conceptual examples to test/demonstrates function calling
+
 - register functions with Vertex AI
 - Vertex AI can leverage your function to respond to a prompt, e.g. latest bitcoin prices
+
+How To:
+1. You need to config ".env" file to include PROJECT_ID, LOCATION to consume Vertex AI.
+
+2. This app uses [User Accounts (3-legged OAuth 2.0)](https://googleapis.dev/python/google-api-core/latest/auth.html#user-accounts-3-legged-oauth-2-0-with-a-refresh-token) `gcloud auth application-default login`
+
+3. `pip install -r requirements.txt`
+
+4. `python path/to/test_btc.py`
